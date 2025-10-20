@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import {
   Users,
   Building,
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   Activity,
   Calendar,
@@ -30,14 +30,20 @@ const SuperAdminDashboard = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [stats, setStats] = useState({
     totalUsers: 0,
+    totalUsersPrev: 0,
     totalTurfs: 0,
+    totalTurfsPrev: 0,
     totalBookings: 0,
+    totalBookingsPrev: 0,
     totalRevenue: 0,
+    totalRevenuePrev: 0,
     monthlyRevenue: 0,
     activeUsers: 0,
     turfAdmins: 0,
+    turfAdminsPrev: 0,
     pendingApprovals: 0,
-    systemHealth: 100
+    systemHealth: 100,
+    systemHealthPrev: 100
   });
 
   const [recentActivities, setRecentActivities] = useState([]);
@@ -80,7 +86,7 @@ const SuperAdminDashboard = () => {
       console.log('System Metrics:', metricsData);
       console.log('Analytics Data:', analyticsDataRes);
 
-      if (statsData) setStats(statsData);
+  if (statsData) setStats(statsData);
       if (activitiesData?.activities) setRecentActivities(activitiesData.activities);
       if (metricsData) setSystemMetrics(metricsData);
       if (analyticsDataRes) setAnalyticsData(analyticsDataRes);
@@ -104,15 +110,19 @@ const SuperAdminDashboard = () => {
     return superAdminService.formatCurrency(amount);
   };
 
+  function percentChange(current, prev) {
+    if (typeof current !== 'number' || typeof prev !== 'number') return '0%';
+    if (prev === 0) return current === 0 ? '0%' : '+100%';
+    const diff = ((current - prev) / prev) * 100;
+    const sign = diff > 0 ? '+' : '';
+    return `${sign}${diff.toFixed(1)}%`;
+  }
+
   const statCards = [
     {
       title: "Total Users",
       value: stats.totalUsers?.toLocaleString() || "0",
-      change: (() => {
-        const diff = (typeof stats.totalUsers === 'number' && typeof stats.totalUsersPrev === 'number') ? (stats.totalUsers - stats.totalUsersPrev) : 0;
-        const sign = diff >= 0 ? '+' : '';
-        return `${sign}${diff}`;
-      })(),
+      change: percentChange(stats.totalUsers, stats.totalUsersPrev),
       changeType: (typeof stats.totalUsers === 'number' && typeof stats.totalUsersPrev === 'number' && (stats.totalUsers - stats.totalUsersPrev) >= 0) ? "increase" : "decrease",
       icon: Users,
       color: (typeof stats.totalUsers === 'number' && typeof stats.totalUsersPrev === 'number' && (stats.totalUsers - stats.totalUsersPrev) >= 0) ? "green" : "red",
@@ -121,11 +131,7 @@ const SuperAdminDashboard = () => {
     {
       title: "Total Turfs",
       value: stats.totalTurfs?.toLocaleString() || "0",
-      change: (() => {
-        const diff = (typeof stats.totalTurfs === 'number' && typeof stats.totalTurfsPrev === 'number') ? (stats.totalTurfs - stats.totalTurfsPrev) : 0;
-        const sign = diff >= 0 ? '+' : '';
-        return `${sign}${diff}`;
-      })(),
+      change: percentChange(stats.totalTurfs, stats.totalTurfsPrev),
       changeType: (typeof stats.totalTurfs === 'number' && typeof stats.totalTurfsPrev === 'number' && (stats.totalTurfs - stats.totalTurfsPrev) >= 0) ? "increase" : "decrease",
       icon: Building,
       color: (typeof stats.totalTurfs === 'number' && typeof stats.totalTurfsPrev === 'number' && (stats.totalTurfs - stats.totalTurfsPrev) >= 0) ? "green" : "red",
@@ -134,11 +140,7 @@ const SuperAdminDashboard = () => {
     {
       title: "Total Bookings",
       value: stats.totalBookings?.toLocaleString() || "0",
-      change: (() => {
-        const diff = (typeof stats.totalBookings === 'number' && typeof stats.totalBookingsPrev === 'number') ? (stats.totalBookings - stats.totalBookingsPrev) : 0;
-        const sign = diff >= 0 ? '+' : '';
-        return `${sign}${diff}`;
-      })(),
+      change: percentChange(stats.totalBookings, stats.totalBookingsPrev),
       changeType: (typeof stats.totalBookings === 'number' && typeof stats.totalBookingsPrev === 'number' && (stats.totalBookings - stats.totalBookingsPrev) >= 0) ? "increase" : "decrease",
       icon: Calendar,
       color: (typeof stats.totalBookings === 'number' && typeof stats.totalBookingsPrev === 'number' && (stats.totalBookings - stats.totalBookingsPrev) >= 0) ? "green" : "red",
@@ -147,24 +149,16 @@ const SuperAdminDashboard = () => {
     {
       title: "Total Revenue",
       value: formatCurrency(stats.totalRevenue || 0),
-      change: (() => {
-        const diff = (typeof stats.totalRevenue === 'number' && typeof stats.totalRevenuePrev === 'number') ? (stats.totalRevenue - stats.totalRevenuePrev) : 0;
-        const sign = diff >= 0 ? '+' : '';
-        return `${sign}${diff}`;
-      })(),
+      change: percentChange(stats.totalRevenue, stats.totalRevenuePrev),
       changeType: (typeof stats.totalRevenue === 'number' && typeof stats.totalRevenuePrev === 'number' && (stats.totalRevenue - stats.totalRevenuePrev) >= 0) ? "increase" : "decrease",
-      icon: DollarSign,
+      icon: IndianRupee,
       color: (typeof stats.totalRevenue === 'number' && typeof stats.totalRevenuePrev === 'number' && (stats.totalRevenue - stats.totalRevenuePrev) >= 0) ? "green" : "red",
       description: `${formatCurrency(stats.monthlyRevenue || 0)} this month`
     },
     {
       title: "Turf Admins",
       value: stats.turfAdmins?.toLocaleString() || "0",
-      change: (() => {
-        const diff = (typeof stats.turfAdmins === 'number' && typeof stats.turfAdminsPrev === 'number') ? (stats.turfAdmins - stats.turfAdminsPrev) : 0;
-        const sign = diff >= 0 ? '+' : '';
-        return `${sign}${diff}`;
-      })(),
+      change: percentChange(stats.turfAdmins, stats.turfAdminsPrev),
       changeType: (typeof stats.turfAdmins === 'number' && typeof stats.turfAdminsPrev === 'number' && (stats.turfAdmins - stats.turfAdminsPrev) >= 0) ? "increase" : "decrease",
       icon: Shield,
       color: (typeof stats.turfAdmins === 'number' && typeof stats.turfAdminsPrev === 'number' && (stats.turfAdmins - stats.turfAdminsPrev) >= 0) ? "green" : "red",
@@ -172,12 +166,23 @@ const SuperAdminDashboard = () => {
     },
     {
       title: "System Health",
-      value: `${stats.systemHealth}%`,
-      change: "Excellent",
-      changeType: "neutral",
+      value: typeof stats.systemHealth === 'object' && stats.systemHealth !== null
+        ? (stats.systemHealth.percentage !== undefined ? `${stats.systemHealth.percentage}%` : "-")
+        : `${stats.systemHealth}%`,
+      change: percentChange(
+        typeof stats.systemHealth === 'object' && stats.systemHealth !== null ? stats.systemHealth.percentage : stats.systemHealth,
+        typeof stats.systemHealthPrev === 'object' && stats.systemHealthPrev !== null ? stats.systemHealthPrev.percentage : stats.systemHealthPrev
+      ),
+      changeType: (typeof stats.systemHealth === 'number' && typeof stats.systemHealthPrev === 'number' && (stats.systemHealth - stats.systemHealthPrev) >= 0) ? "increase" : "decrease",
       icon: Activity,
-      color: "emerald",
-      description: "All systems operational"
+      color: (typeof stats.systemHealth === 'number' && typeof stats.systemHealthPrev === 'number' && (stats.systemHealth - stats.systemHealthPrev) >= 0) ? "green" : "red",
+      description: typeof stats.systemHealth === 'object' && stats.systemHealth !== null
+        ? (stats.systemHealth.description || "")
+        : stats.systemHealth >= 80
+          ? "All systems operational"
+          : stats.systemHealth >= 50
+            ? "Some issues detected"
+            : "Critical issues!"
     }
   ];
 
@@ -198,7 +203,7 @@ const SuperAdminDashboard = () => {
       case "user": return <Users className="w-4 h-4 text-blue-500" />;
       case "booking": return <Calendar className="w-4 h-4 text-green-500" />;
       case "admin": return <Shield className="w-4 h-4 text-purple-500" />;
-      case "payment": return <DollarSign className="w-4 h-4 text-orange-500" />;
+  case "payment": return <IndianRupee className="w-4 h-4 text-orange-500" />;
       case "system": return <Activity className="w-4 h-4 text-gray-500" />;
       default: return <Clock className="w-4 h-4 text-gray-400" />;
     }

@@ -15,7 +15,7 @@ import {
   Clock,
   AlertTriangle,
   Users,
-  DollarSign,
+  IndianRupee,
   Calendar,
   Camera,
   Upload,
@@ -253,7 +253,7 @@ const SuperAdminTurfs = () => {
         numericValue: stats.totalRevenue,
         change,
         changeType,
-        icon: DollarSign,
+  icon: IndianRupee,
         color: 'purple',
         description: 'Monthly earnings'
       };
@@ -504,7 +504,7 @@ const SuperAdminTurfs = () => {
                     </div>
                     <div className="text-center p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center justify-center mb-1">
-                        <DollarSign className="w-4 h-4 text-gray-600" />
+                        <IndianRupee className="w-4 h-4 text-gray-600" />
                       </div>
                       <div className="text-sm font-medium text-gray-900">
                         ₹{((turf.revenue || 0) / 1000).toFixed(0)}k

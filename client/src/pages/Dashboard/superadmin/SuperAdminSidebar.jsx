@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Users, Shield, Building, UserCheck, BarChart3, DollarSign, Activity, Bell, Database, Mail, HelpCircle, Settings, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Users, Shield, Building, UserCheck, BarChart3, IndianRupee, Activity, Bell, Database, Mail, HelpCircle, Settings, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 // Compact, scrollable sidebar for superadmin pages
@@ -17,9 +17,9 @@ const SuperAdminSidebar = ({ isMobileOpen = false }) => {
     { title: 'Turfs', icon: Building, path: '/dashboard/superadmin/turfs' },
     { title: 'Bookings', icon: UserCheck, path: '/dashboard/superadmin/bookings' },
     { title: 'Analytics', icon: BarChart3, path: '/dashboard/superadmin/analytics' },
-    { title: 'Revenue', icon: DollarSign, path: '/dashboard/superadmin/revenue' },
+  { title: 'Revenue', icon: IndianRupee, path: '/dashboard/superadmin/revenue' },
     { title: 'System Health', icon: Activity, path: '/dashboard/superadmin/system-health' },
-      { title: 'Validate Razorpay', icon: ShieldCheck, path: '/admin/validate-razorpay' },
+    { title: 'Validate Razorpay', icon: Activity, path: '/admin/validate-razorpay' },
     { title: 'Notifications', icon: Bell, path: '/dashboard/superadmin/notifications' },
     { title: 'Database', icon: Database, path: '/dashboard/superadmin/database' },
     { title: 'Emails', icon: Mail, path: '/dashboard/superadmin/emails' },

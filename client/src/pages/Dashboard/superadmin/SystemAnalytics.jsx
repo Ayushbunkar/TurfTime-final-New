@@ -4,7 +4,7 @@ import {
   TrendingUp,
   Users,
   Building,
-  DollarSign,
+  IndianRupee,
   Calendar,
   Download,
   Filter,
@@ -310,7 +310,7 @@ const SystemAnalytics = () => {
             />
             <KPICard
               title="Monthly Revenue"
-              icon={DollarSign}
+              icon={IndianRupee}
               value={analyticsData.kpis.monthlyRevenue.value}
               change={analyticsData.kpis.monthlyRevenue.change}
               trend={analyticsData.kpis.monthlyRevenue.trend}

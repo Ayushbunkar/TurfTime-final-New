@@ -5,7 +5,7 @@ import {
   Clock,
   User,
   MapPin,
-  DollarSign,
+  IndianRupee,
   Filter,
   Search,
   Eye,
@@ -282,7 +282,7 @@ const SuperAdminBookingManagement = () => {
               <p className="text-xs font-medium text-gray-600 uppercase">Revenue</p>
               <p className="text-xl sm:text-2xl font-bold text-green-600">₹{(statistics.totalRevenue / 1000).toFixed(0)}K</p>
             </div>
-            <DollarSign className="w-6 sm:w-8 h-6 sm:h-8 text-green-600" />
+            <IndianRupee className="w-6 sm:w-8 h-6 sm:h-8 text-green-600" />
           </div>
         </div>
       </div>
@@ -440,7 +440,7 @@ const SuperAdminBookingManagement = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
                           <div className="text-sm font-medium text-gray-900 flex items-center">
-                            <DollarSign className="w-4 h-4 mr-1 text-green-600" />
+                            <IndianRupee className="w-4 h-4 mr-1 text-green-600" />
                             ₹{booking.amount?.toLocaleString() || '0'}
                           </div>
                           <div className="text-xs text-gray-500 flex items-center">

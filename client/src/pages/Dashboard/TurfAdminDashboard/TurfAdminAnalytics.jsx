@@ -216,7 +216,7 @@ import {
   TrendingDown,
   Users,
   Calendar,
-  DollarSign,
+  IndianRupee,
   BarChart3,
   PieChart,
   Activity,

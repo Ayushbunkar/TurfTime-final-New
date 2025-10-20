@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   TrendingDown,
   Calendar,
@@ -104,21 +104,35 @@ const SuperAdminRevenue = () => {
     }
   };
 
+  // Helper to format percent and avoid NaN
+  const safePercent = (val, sign = '+') => {
+    if (typeof val !== 'number' || isNaN(val)) return `${sign}0%`;
+    const prefix = val > 0 ? '+' : val < 0 ? '-' : '';
+    return `${prefix}${Math.abs(val)}%`;
+  };
+
+  // Calculate percent change for each stat (current vs previous)
+  const percentChange = (current, prev) => {
+    if (typeof current !== 'number' || typeof prev !== 'number' || isNaN(current) || isNaN(prev)) return 0;
+    if (prev === 0) return current > 0 ? 100 : 0;
+    return Math.round(((current - prev) / Math.abs(prev)) * 100);
+  };
+
   const statCards = [
     {
       title: "Total Revenue",
       value: `₹${(revenueStats.totalRevenue / 100000).toFixed(1)}L`,
-      change: `+${revenueStats.growth}%`,
-      changeType: "increase",
-      icon: DollarSign,
+      change: safePercent(percentChange(revenueStats.totalRevenue, revenueStats.totalRevenuePrev)),
+      changeType: percentChange(revenueStats.totalRevenue, revenueStats.totalRevenuePrev) < 0 ? "decrease" : "increase",
+      icon: IndianRupee,
       color: "blue",
       description: "All-time earnings"
     },
     {
       title: "Monthly Revenue",
       value: `₹${(revenueStats.monthlyRevenue / 100000).toFixed(1)}L`,
-      change: "+15.2%",
-      changeType: "increase",
+      change: safePercent(percentChange(revenueStats.monthlyRevenue, revenueStats.monthlyRevenuePrev)),
+      changeType: percentChange(revenueStats.monthlyRevenue, revenueStats.monthlyRevenuePrev) < 0 ? "decrease" : "increase",
       icon: TrendingUp,
       color: "green", 
       description: "This month"
@@ -126,8 +140,8 @@ const SuperAdminRevenue = () => {
     {
       title: "Platform Fee",
       value: `₹${(revenueStats.platformFee / 100000).toFixed(1)}L`,
-      change: "+12.8%",
-      changeType: "increase",
+      change: safePercent(percentChange(revenueStats.platformFee, revenueStats.platformFeePrev)),
+      changeType: percentChange(revenueStats.platformFee, revenueStats.platformFeePrev) < 0 ? "decrease" : "increase",
       icon: Percent,
       color: "purple",
       description: "Commission earned"
@@ -135,8 +149,8 @@ const SuperAdminRevenue = () => {
     {
       title: "Pending Payments",
       value: `₹${(revenueStats.pendingPayments / 1000).toFixed(0)}k`,
-      change: "-5.2%",
-      changeType: "decrease",
+      change: safePercent(percentChange(revenueStats.pendingPayments, revenueStats.pendingPaymentsPrev), '-'),
+      changeType: percentChange(revenueStats.pendingPayments, revenueStats.pendingPaymentsPrev) < 0 ? "decrease" : "increase",
       icon: Clock,
       color: "orange",
       description: "Awaiting settlement"
@@ -466,7 +480,7 @@ const SuperAdminRevenue = () => {
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                           {transaction.paymentMethod === 'UPI' ? (
-                            <DollarSign className="w-4 h-4 text-blue-600" />
+                            <IndianRupee className="w-4 h-4 text-blue-600" />
                           ) : (
                             <CreditCard className="w-4 h-4 text-blue-600" />
                           )}

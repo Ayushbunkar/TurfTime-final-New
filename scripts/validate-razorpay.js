@@ -1,9 +1,3 @@
-#!/usr/bin/env node
-// Simple script to POST /api/payments/validate-keys
-// Usage (PowerShell):
-//   $env:API_URL='http://localhost:5000'; $env:AUTH_TOKEN='Bearer <token>'; node scripts/validate-razorpay.js
-// Or using curl (PowerShell):
-//   Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/payments/validate-keys" -Headers @{ Authorization = 'Bearer <token>' }
 
 const fetch = require('node-fetch');
 

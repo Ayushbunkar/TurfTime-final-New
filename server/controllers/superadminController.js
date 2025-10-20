@@ -303,20 +303,60 @@ export async function getDatabasePerformance(req, res) {
 // Fetch revenue statistics for superadmin dashboard
 export async function getRevenueStats(req, res) {
   try {
-    // Total revenue
+    // Platform fee percent (set as needed)
+    const PLATFORM_FEE_PERCENT = 10; // 10% platform fee
+
+    // Dates
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonth = new Date(firstDayOfMonth);
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+    // Total revenue (all time)
     const totalRevenueAgg = await Booking.aggregate([
       { $group: { _id: null, total: { $sum: "$price" } } }
     ]);
     const totalRevenue = totalRevenueAgg[0]?.total || 0;
 
-    // Monthly revenue
-    const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // Previous total revenue (previous month)
+    const totalRevenuePrevAgg = await Booking.aggregate([
+      { $match: { createdAt: { $gte: lastMonth, $lt: firstDayOfMonth } } },
+      { $group: { _id: null, total: { $sum: "$price" } } }
+    ]);
+    const totalRevenuePrev = totalRevenuePrevAgg[0]?.total || 0;
+
+    // Monthly revenue (this month)
     const monthlyRevenueAgg = await Booking.aggregate([
       { $match: { createdAt: { $gte: firstDayOfMonth } } },
       { $group: { _id: null, total: { $sum: "$price" } } }
     ]);
     const monthlyRevenue = monthlyRevenueAgg[0]?.total || 0;
+
+    // Previous monthly revenue (last month)
+    const monthlyRevenuePrevAgg = await Booking.aggregate([
+      { $match: { createdAt: { $gte: lastMonth, $lt: firstDayOfMonth } } },
+      { $group: { _id: null, total: { $sum: "$price" } } }
+    ]);
+    const monthlyRevenuePrev = monthlyRevenuePrevAgg[0]?.total || 0;
+
+    // Platform fee (all time)
+    const platformFee = Math.round(totalRevenue * PLATFORM_FEE_PERCENT / 100);
+    // Platform fee previous (previous month)
+    const platformFeePrev = Math.round(totalRevenuePrev * PLATFORM_FEE_PERCENT / 100);
+
+    // Pending payments (all time, status != 'paid')
+    const pendingPaymentsAgg = await Booking.aggregate([
+      { $match: { status: { $ne: 'paid' } } },
+      { $group: { _id: null, total: { $sum: "$price" } } }
+    ]);
+    const pendingPayments = pendingPaymentsAgg[0]?.total || 0;
+
+    // Pending payments previous (previous month, status != 'paid')
+    const pendingPaymentsPrevAgg = await Booking.aggregate([
+      { $match: { status: { $ne: 'paid' }, createdAt: { $gte: lastMonth, $lt: firstDayOfMonth } } },
+      { $group: { _id: null, total: { $sum: "$price" } } }
+    ]);
+    const pendingPaymentsPrev = pendingPaymentsPrevAgg[0]?.total || 0;
 
     // Revenue trends (last 12 months)
     const revenueTrends = await Booking.aggregate([
@@ -329,7 +369,17 @@ export async function getRevenueStats(req, res) {
       { $sort: { _id: 1 } }
     ]);
 
-    res.json({ totalRevenue, monthlyRevenue, revenueTrends });
+    res.json({
+      totalRevenue,
+      totalRevenuePrev,
+      monthlyRevenue,
+      monthlyRevenuePrev,
+      platformFee,
+      platformFeePrev,
+      pendingPayments,
+      pendingPaymentsPrev,
+      revenueTrends
+    });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch revenue statistics', details: err.message });
   }
@@ -1128,45 +1178,69 @@ export async function getAnalytics(req, res) {
 
 export async function getDashboardStats(req, res) {
   try {
-    // Total users
-    const totalUsers = await User.countDocuments({});
-    // Active users (last 30 days)
-    const thirtyDaysAgo = new Date();
+    // Current period: last 30 days
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Previous period: 30-60 days ago
+    const sixtyDaysAgo = new Date(now);
+    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+    const prevPeriodStart = new Date(sixtyDaysAgo);
+    const prevPeriodEnd = new Date(thirtyDaysAgo);
+
+    // Users
+    const totalUsers = await User.countDocuments({});
+    const totalUsersPrev = await User.countDocuments({ createdAt: { $gte: prevPeriodStart, $lt: prevPeriodEnd } });
     const activeUsers = await User.countDocuments({ updatedAt: { $gte: thirtyDaysAgo } });
 
-    // Turf admins
-    const turfAdmins = await User.countDocuments({ role: 'Turfadmin' });
-    // Superadmin pending approvals (turfs not approved)
-    const pendingApprovals = await Turf.countDocuments({ isApproved: false });
-    // Total turfs
+    // Turfs
     const totalTurfs = await Turf.countDocuments({});
+    const totalTurfsPrev = await Turf.countDocuments({ createdAt: { $gte: prevPeriodStart, $lt: prevPeriodEnd } });
 
-    // Total bookings
+    // Bookings
     const totalBookings = await Booking.countDocuments({});
-    // Monthly bookings (last 30 days)
+    const totalBookingsPrev = await Booking.countDocuments({ createdAt: { $gte: prevPeriodStart, $lt: prevPeriodEnd } });
     const monthlyBookings = await Booking.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
 
-    // Total revenue (sum of all paid bookings)
+    // Revenue
     const paidBookings = await Booking.find({ status: 'paid' });
     const totalRevenue = paidBookings.reduce((sum, b) => sum + (b.price || 0), 0);
+    // Previous period revenue
+    const paidBookingsPrev = await Booking.find({ status: 'paid', createdAt: { $gte: prevPeriodStart, $lt: prevPeriodEnd } });
+    const totalRevenuePrev = paidBookingsPrev.reduce((sum, b) => sum + (b.price || 0), 0);
     // Monthly revenue (last 30 days)
     const monthlyRevenue = paidBookings.filter(b => new Date(b.createdAt) >= thirtyDaysAgo).reduce((sum, b) => sum + (b.price || 0), 0);
 
+    // Turf Admins
+    const turfAdmins = await User.countDocuments({ role: 'Turfadmin' });
+    const turfAdminsPrev = await User.countDocuments({ role: 'Turfadmin', createdAt: { $gte: prevPeriodStart, $lt: prevPeriodEnd } });
+    // Superadmin pending approvals (turfs not approved)
+    const pendingApprovals = await Turf.countDocuments({ isApproved: false });
+
     // System health (mock: % of approved turfs)
-    const systemHealth = totalTurfs === 0 ? 100 : Math.round((await Turf.countDocuments({ isApproved: true }) / totalTurfs) * 100);
+    const approvedTurfs = await Turf.countDocuments({ isApproved: true });
+    const approvedTurfsPrev = await Turf.countDocuments({ isApproved: true, createdAt: { $gte: prevPeriodStart, $lt: prevPeriodEnd } });
+    const systemHealth = totalTurfs === 0 ? 100 : Math.round((approvedTurfs / totalTurfs) * 100);
+    const systemHealthPrev = totalTurfsPrev === 0 ? 100 : Math.round((approvedTurfsPrev / totalTurfsPrev) * 100);
 
     res.json({
       totalUsers,
+      totalUsersPrev,
       activeUsers,
       turfAdmins,
+      turfAdminsPrev,
       pendingApprovals,
       totalTurfs,
+      totalTurfsPrev,
       totalBookings,
+      totalBookingsPrev,
       monthlyBookings,
       totalRevenue,
+      totalRevenuePrev,
       monthlyRevenue,
-      systemHealth
+      systemHealth,
+      systemHealthPrev
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch dashboard stats', details: err.message });

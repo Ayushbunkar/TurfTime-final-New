@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, Search, Menu, Moon, Sun, LogOut, ShieldCheck } from 'lucide-react';
+import { Bell, Search, Menu, Moon, Sun, LogOut } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import superAdminService from '../../../services/superAdminService';
 
@@ -58,8 +58,8 @@ const SuperAdminNavbar = ({ onMobileMenuToggle }) => {
           </button>
 
           {/* Validate Razorpay Keys (admin utility) */}
+          {/* Validate Razorpay Keys (admin utility) icon removed as ShieldCheck is not available */}
           <a href="/admin/validate-razorpay" className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-slate-800 hidden sm:inline-flex items-center gap-2 text-sm bg-amber-50 text-amber-800 dark:bg-amber-900/10 dark:text-amber-300">
-            <ShieldCheck className="w-4 h-4" />
             <span className="text-xs">Validate Keys</span>
           </a>
 

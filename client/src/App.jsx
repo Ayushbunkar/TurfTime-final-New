@@ -397,7 +397,8 @@ const App = () => {
 function FooterVisibility() {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith("/dashboard");
-  return !isDashboard ? <Footer /> : null;
+  const isValidateRazorpay = location.pathname === "/admin/validate-razorpay";
+  return !isDashboard && !isValidateRazorpay ? <Footer /> : null;
 }
 
 export default App;

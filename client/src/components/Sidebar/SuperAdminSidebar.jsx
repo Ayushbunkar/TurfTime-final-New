@@ -1,138 +1,78 @@
-import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import {
-  LayoutDashboard, Users, Shield, ShieldCheck, BarChart3, Settings, Bell,
-  LogOut, ChevronLeft, ChevronRight, UserCheck, Building,
-  Activity, DollarSign, Database, Mail, HelpCircle
-} from "lucide-react";
-import { useAuth } from "../../../context/AuthContext";
+import React, { useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { LayoutDashboard, Users, Shield, Building, UserCheck, BarChart3, IndianRupee, Activity, Bell, Database, Mail, HelpCircle, Settings, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
-const menuItems = [
-  { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard/superadmin", description: "Overview & Analytics" },
-  { title: "User Management", icon: Users, path: "/dashboard/superadmin/users", description: "Manage all users" },
-  { title: "Turf Admin Management", icon: Shield, path: "/dashboard/superadmin/turf-admins", description: "Manage turf administrators" },
-  { title: "Turfs & Venues", icon: Building, path: "/dashboard/superadmin/turfs", description: "Manage all turfs" },
-  { title: "Bookings", icon: UserCheck, path: "/dashboard/superadmin/bookings", description: "Monitor all bookings" },
-  { title: "Analytics & Reports", icon: BarChart3, path: "/dashboard/superadmin/analytics", description: "System analytics" },
-  { title: "Revenue Management", icon: DollarSign, path: "/dashboard/superadmin/revenue", description: "Financial overview" },
-  { title: "System Health", icon: Activity, path: "/dashboard/superadmin/system-health", description: "Monitor system status" },
-  { title: "Notifications", icon: Bell, path: "/dashboard/superadmin/notifications", description: "System alerts" },
-  { title: "Database Management", icon: Database, path: "/dashboard/superadmin/database", description: "Database operations" },
-  { title: "Email Management", icon: Mail, path: "/dashboard/superadmin/emails", description: "Email campaigns" },
-  { title: "Support & Tickets", icon: HelpCircle, path: "/dashboard/superadmin/support", description: "Customer support" },
-  { title: "Settings", icon: Settings, path: "/dashboard/superadmin/settings", description: "System configuration" },
-];
-
-const SuperAdminSidebar = ({ isMobileOpen = false, onMobileClose = () => {} }) => {
+// Compact, scrollable sidebar for superadmin pages
+const SuperAdminSidebar = ({ isMobileOpen = false }) => {
   const [collapsed, setCollapsed] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const items = [
+    { title: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/superadmin' },
+    { title: 'Users', icon: Users, path: '/dashboard/superadmin/users' },
+    { title: 'Turf Admins', icon: Shield, path: '/dashboard/superadmin/turf-admins' },
+    { title: 'Turfs', icon: Building, path: '/dashboard/superadmin/turfs' },
+    { title: 'Bookings', icon: UserCheck, path: '/dashboard/superadmin/bookings' },
+    { title: 'Analytics', icon: BarChart3, path: '/dashboard/superadmin/analytics' },
+  { title: 'Revenue', icon: IndianRupee, path: '/dashboard/superadmin/revenue' },
+    { title: 'System Health', icon: Activity, path: '/dashboard/superadmin/system-health' },
+    { title: 'Validate Razorpay', icon: Activity, path: '/admin/validate-razorpay' },
+    { title: 'Notifications', icon: Bell, path: '/dashboard/superadmin/notifications' },
+    { title: 'Database', icon: Database, path: '/dashboard/superadmin/database' },
+    { title: 'Emails', icon: Mail, path: '/dashboard/superadmin/emails' },
+    { title: 'Support', icon: HelpCircle, path: '/dashboard/superadmin/support' },
+    { title: 'Settings', icon: Settings, path: '/dashboard/superadmin/settings' },
+  ];
+
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate('/login');
   };
 
-  const sidebarVariants = { expanded: { width: "320px" }, collapsed: { width: "80px" } };
-  const itemVariants = { expanded: { opacity: 1, x: 0 }, collapsed: { opacity: 0, x: -10 } };
-
   return (
-    <motion.div
-      variants={sidebarVariants}
-      animate={collapsed ? "collapsed" : "expanded"}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className={`bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white fixed left-0 z-40 shadow-2xl flex flex-col overflow-hidden min-h-0 ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"} lg:block h-screen`}
+    <motion.aside
+      initial={{ x: -320 }}
+      animate={{ x: 0 }}
+      transition={{ duration: 0.25 }}
+      className={`fixed left-0 top-20 z-40 bg-slate-900 text-white shadow-xl flex flex-col min-h-0 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} lg:block w-64`}
     >
-      {/* Header */}
-      <div
-        className="p-4 border-b border-slate-700 flex justify-between items-center cursor-pointer"
-        onClick={() => navigate("/dashboard/superadmin")}
-      >
-        {!collapsed && (
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold">Super Admin</h1>
-              <p className="text-xs text-slate-400">TurfOwn Platform</p>
-            </div>
-          </div>
-        )}
-        <button onClick={() => setCollapsed(!collapsed)} className="p-2 hover:bg-slate-700 rounded-lg">
+      <div className="p-4 flex items-center justify-between border-b border-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-md flex items-center justify-center font-bold">S</div>
+          {!collapsed && <div><div className="font-semibold">Super Admin</div><div className="text-xs text-slate-400">TurfOwn</div></div>}
+        </div>
+        <button onClick={() => setCollapsed(s => !s)} className="p-2 rounded hover:bg-slate-800">
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
       </div>
 
-      {/* User Info */}
-      <div className="p-4 border-b border-slate-700 flex items-center space-x-3">
-        <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-          <span className="text-sm font-bold">{user?.name?.charAt(0) || "S"}</span>
-        </div>
-        {!collapsed && (
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{user?.name || "Super Admin"}</p>
-            <p className="text-xs text-slate-400 truncate">{user?.email || "admin@turfown.com"}</p>
-            <div className="flex items-center mt-1 text-xs text-green-400">
-              <div className="w-2 h-2 bg-green-400 rounded-full mr-1"></div>Online
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-2">
-        {menuItems.map(({ icon: Icon, title, path, description }) => (
-          <NavLink
-            key={path}
-            to={path}
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group relative ${
-                isActive
-                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                  : "text-slate-300 hover:bg-slate-700 hover:text-white"
-              }`
-            }
-          >
-            <Icon className="w-5 h-5 flex-shrink-0" />
-            {!collapsed && (
-              <motion.div
-                variants={itemVariants}
-                animate={collapsed ? "collapsed" : "expanded"}
-                className="flex-1 min-w-0"
-              >
-                <p className="text-sm font-medium truncate">{title}</p>
-                <p className="text-xs text-slate-400 truncate">{description}</p>
-              </motion.div>
-            )}
-          </NavLink>
-        ))}
+      <nav className="flex-1 overflow-y-auto px-2 py-3 min-h-0">
+        <ul className="space-y-1">
+          {items.map((it) => {
+            const Icon = it.icon;
+            return (
+              <li key={it.path}>
+                <NavLink to={it.path} className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded-md ${isActive ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'}`}>
+                  <Icon className="w-5 h-5" />
+                  {!collapsed && <span className="text-sm truncate">{it.title}</span>}
+                </NavLink>
+              </li>
+            );
+          })}
+        </ul>
       </nav>
 
-      {/* Footer */}
-      <div className="mt-auto p-4 border-t border-slate-700 flex-shrink-0">
-        {!collapsed && (
-          <div className="text-xs text-slate-400">
-            <div className="flex justify-between">
-              <span>System Status</span>
-              <span className="text-green-400 flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>Healthy
-              </span>
-            </div>
-            <div className="flex justify-between"><span>Server Load</span><span>23%</span></div>
-            <div className="flex justify-between"><span>Active Users</span><span>1,247</span></div>
-          </div>
-        )}
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-slate-300 hover:bg-red-600 hover:text-white transition-colors"
-        >
-          <LogOut className="w-5 h-5 flex-shrink-0" />
-          {!collapsed && <span className="text-sm font-medium">Logout</span>}
-        </button>
+      <div className="p-4 border-t border-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center text-white font-bold">{user?.name?.[0] || 'S'}</div>
+          {!collapsed && <div className="flex-1"><div className="text-sm">{user?.name || 'Super Admin'}</div><div className="text-xs text-slate-400">Online</div></div>}
+          <button onClick={handleLogout} className="p-2 rounded-md hover:bg-slate-800"><LogOut className="w-5 h-5 text-red-500" /></button>
+        </div>
       </div>
-    </motion.div>
+    </motion.aside>
   );
 };
 

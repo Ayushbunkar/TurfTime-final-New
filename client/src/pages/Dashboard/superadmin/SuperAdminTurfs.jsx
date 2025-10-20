@@ -15,7 +15,7 @@ import {
   Clock,
   AlertTriangle,
   Users,
-  DollarSign,
+  IndianRupee,
   Calendar,
   Camera,
   Upload,
@@ -252,7 +252,7 @@ const SuperAdminTurfs = () => {
       value: `₹${isNaN(stats.totalRevenue) ? 0 : (stats.totalRevenue / 100000).toFixed(1)}L`,
       change: "+22%",
       changeType: "increase",
-      icon: DollarSign,
+  icon: IndianRupee,
       color: "purple",
       description: "Monthly earnings"
     }

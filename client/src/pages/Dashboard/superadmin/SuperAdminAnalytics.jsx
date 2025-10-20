@@ -22,7 +22,7 @@ import {
   TrendingDown,
   Users,
   Calendar,
-  DollarSign,
+  IndianRupee,
   MapPin,
   BarChart3,
   PieChart as PieChartIcon,
@@ -230,7 +230,7 @@ const SuperAdminAnalytics = () => {
                   {formatPercentage(analyticsData.overview?.growthMetrics?.revenueGrowth || 0)}
                 </div>
                 <div className="p-3 bg-green-100 rounded-lg">
-                  <DollarSign className="w-8 h-8 text-green-600" />
+                  <IndianRupee className="w-8 h-8 text-green-600" />
                 </div>
               </div>
             </motion.div>
