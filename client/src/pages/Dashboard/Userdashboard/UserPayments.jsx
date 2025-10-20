@@ -77,7 +77,29 @@ const UserPayments = () => {
       ? [Clock, "bg-yellow-100 text-yellow-600"]
       : [AlertCircle, "bg-gray-100 text-gray-600"];
 
-  const downloadReceipt = (p) => toast.success(`Downloading receipt for ${p.transactionId}`);
+  const downloadReceipt = async (p) => {
+    try {
+      toast.loading("Preparing receipt...");
+      // Assume p.booking._id is the booking ID
+      const bookingId = p.booking?._id || p.booking?.bookingId || p.booking?.id || p._id;
+      if (!bookingId) {
+        toast.error("Booking ID not found for this payment.");
+        return;
+      }
+      const res = await api.get(`/api/bookings/${bookingId}/invoice`, { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `receipt-${bookingId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Receipt downloaded!");
+    } catch (e) {
+      toast.error("Failed to download receipt.");
+    }
+  };
 
   const refresh = async () => {
     setLoading(true);
